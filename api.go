@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -26,6 +27,7 @@ func NewAPI() *API {
 func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
 	for i, g := range a.games {
 		if !g.redPlayer.Ready {
+			log.Println("red player somehow not ready")
 			g.redPlayer.Ready = true
 			if g.bluePlayer.Ready {
 				g.simulator.Setup()
@@ -44,7 +46,9 @@ func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
+	log.Printf("creating new game %v", a.nextInt)
 	a.games[a.nextInt] = NewSession()
+	a.games[a.nextInt].redPlayer.Ready = true
 	respondWithJSON(res, http.StatusOK, newGameResp{a.nextInt, "red"})
 	a.nextInt = a.nextInt + 1
 }
@@ -60,7 +64,8 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 	var gr gameReq
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&gr); err != nil {
-		respondWithError(res, http.StatusBadRequest, "Invalid resquest payload")
+		log.Println(err)
+		respondWithError(res, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 	defer req.Body.Close()
