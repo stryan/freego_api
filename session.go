@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"git.saintnet.tech/stryan/freego"
 )
@@ -39,8 +40,8 @@ func NewSession() *Session {
 		simulator:  sim,
 		redPlayer:  &Player{false, freego.Red},
 		bluePlayer: &Player{false, freego.Blue},
-		moveNum:    0,
-		moveList:   []freego.ParsedCommand{},
+		moveNum:    1,
+		moveList:   make([]freego.ParsedCommand, 20),
 	}
 }
 
@@ -56,21 +57,22 @@ func (s *Session) tryMove(player *Player, move string) (*freego.ParsedCommand, e
 	return p, nil
 }
 
-func (s *Session) mutate(p *freego.ParsedCommand) error {
+func (s *Session) mutate(p *freego.ParsedCommand) (string, error) {
 	success, err := s.simulator.Mutate(p)
 	if err != nil {
-		return err
+		return "", err
 	}
-	if !success {
-		return errors.New("invalid move")
+	if success {
+		s.moveList[s.moveNum] = *p
+		s.moveNum++
+		return fmt.Sprintf("%v %v", s.moveNum-1, p.String()), nil
 	}
-	s.moveList[s.moveNum] = *p
-	s.moveNum++
-	return nil
+	return "", nil
 }
 
 func (s *Session) getMove(p *Player, num int) (string, error) {
-	if num < 0 || num > s.moveNum {
+	if num <= 0 || num >= s.moveNum {
+		log.Printf("tried to get move number %v when move is %v", num, s.moveNum)
 		return "", errors.New("invalid move number")
 	}
 	return fmt.Sprintf("%v %v", num, s.moveList[num].String()), nil

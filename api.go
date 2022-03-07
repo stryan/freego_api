@@ -32,6 +32,7 @@ func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
 			if g.bluePlayer.Ready {
 				g.simulator.Setup()
 				initDummy(g.simulator)
+				log.Println("dummy game started")
 			}
 			respondWithJSON(res, http.StatusOK, newGameResp{i, "red"})
 			return
@@ -41,6 +42,7 @@ func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
 			if g.redPlayer.Ready {
 				g.simulator.Setup()
 				initDummy(g.simulator)
+				log.Println("dummy game started")
 			}
 			respondWithJSON(res, http.StatusOK, newGameResp{i, "blue"})
 			return
@@ -79,6 +81,7 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	//TODO filter based off player info
+	log.Println("sending game state")
 	respondWithJSON(res, http.StatusOK, gameResp{s.simulator})
 	return
 }
@@ -107,6 +110,7 @@ func (a *API) GetGameStatus(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
+	log.Println("sending game status")
 	respondWithJSON(res, http.StatusOK, gameStatusResp{s.simulator.State, s.moveNum})
 }
 
@@ -143,9 +147,17 @@ func (a *API) PostMove(res http.ResponseWriter, req *http.Request) {
 	}
 	parsed, err := s.tryMove(p, gr.Move)
 	if err != nil {
-		respondWithJSON(res, http.StatusOK, gameMovePostRes{false, false, parsed.String(), err})
-	}
+		respondWithError(res, http.StatusBadRequest, err.Error())
 
+	}
+	result, err := s.mutate(parsed)
+	if err != nil {
+		respondWithError(res, http.StatusBadRequest, err.Error())
+	}
+	if result == "" {
+		respondWithJSON(res, http.StatusOK, gameMovePostRes{true, false, "", err})
+	}
+	respondWithJSON(res, http.StatusOK, gameMovePostRes{true, true, result, err})
 }
 
 //GetMove returns the move made at turn X
@@ -156,7 +168,7 @@ func (a *API) GetMove(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "Invalid game ID")
 		return
 	}
-	move, err := strconv.Atoi(vars["move_number"])
+	move, err := strconv.Atoi(vars["movenum"])
 	if err != nil {
 		respondWithError(res, http.StatusBadRequest, "Invalid move number")
 		return
