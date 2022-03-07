@@ -1,7 +1,5 @@
 module git.saintnet.tech/freego_api
 
-replace git.saintnet.tech/freego => ../freego
-
 go 1.17
 
 require (
