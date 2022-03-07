@@ -22,8 +22,27 @@ func NewAPI() *API {
 	}
 }
 
-//NewGame takes a POST and creates a new game
+//NewGame takes a POST and creates a new game or returns an open one
 func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
+	for i, g := range a.games {
+		if !g.redPlayer.Ready {
+			g.redPlayer.Ready = true
+			if g.bluePlayer.Ready {
+				g.simulator.Setup()
+				initDummy(g.simulator)
+			}
+			respondWithJSON(res, http.StatusOK, newGameResp{i, "red"})
+		}
+		if !g.bluePlayer.Ready {
+			g.bluePlayer.Ready = true
+			if g.redPlayer.Ready {
+				g.simulator.Setup()
+				initDummy(g.simulator)
+			}
+			respondWithJSON(res, http.StatusOK, newGameResp{i, "blue"})
+			return
+		}
+	}
 	a.games[a.nextInt] = NewSession()
 	respondWithJSON(res, http.StatusOK, newGameResp{a.nextInt, "red"})
 	a.nextInt = a.nextInt + 1

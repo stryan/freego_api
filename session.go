@@ -34,8 +34,9 @@ func (p *Player) Colour() freego.Colour {
 
 //NewSession creates a new game session
 func NewSession() *Session {
+	sim := freego.NewGame()
 	return &Session{
-		simulator:  freego.NewGame(),
+		simulator:  sim,
 		redPlayer:  &Player{false, freego.Red},
 		bluePlayer: &Player{false, freego.Blue},
 		moveNum:    0,

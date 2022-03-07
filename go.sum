@@ -1,4 +1,6 @@
 git.saintnet.tech/stryan/freego v0.0.0-20220307180035-64bab97c38d6 h1:0GzkfU8R4Rj7SVxTpkOf9oZN4YpW2xe/IjYbNP5Zxjs=
 git.saintnet.tech/stryan/freego v0.0.0-20220307180035-64bab97c38d6/go.mod h1:NXXisQVSPklkvs2Qg6Iv3LqXNaJwwEtho/2WmzhvAZc=
+git.saintnet.tech/stryan/freego v0.0.0-20220307194514-b5fc90339454 h1:KK8YuhJYMjbmyREbCDX+DshFaarrzxhjRTyPDIDhzDs=
+git.saintnet.tech/stryan/freego v0.0.0-20220307194514-b5fc90339454/go.mod h1:NXXisQVSPklkvs2Qg6Iv3LqXNaJwwEtho/2WmzhvAZc=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
