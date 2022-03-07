@@ -11,4 +11,6 @@ Currently stores no state and has no user authentication, so using it should jus
   POST /game
   GET /game/{id}
   GET /game/{id}/status
+  POST /game/{id}/move
+  GET /game/{id}/move/{movenum}
 ```
