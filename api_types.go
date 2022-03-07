@@ -25,3 +25,23 @@ type gameStatusResp struct {
 	GameStatus freego.GameState `json:"game_status"`
 	Move       int              `json:"move"`
 }
+
+type gameMovePostReq struct {
+	PlayerID string `json:"player_id"`
+	Move     string `json:"move"`
+}
+
+type gameMovePostRes struct {
+	Valid  bool   `json:"valid"`
+	Result bool   `json:"result"`
+	Parsed string `json:"parsed"`
+	Error  error  `json:"error"`
+}
+
+type gameMoveReq struct {
+	PlayerID string `json:"player_id"`
+}
+
+type gameMoveRes struct {
+	Move string `json:"move"`
+}

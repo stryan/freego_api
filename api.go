@@ -53,6 +53,7 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
+	//TODO filter based off player info
 	respondWithJSON(res, http.StatusOK, gameResp{s.simulator})
 	return
 }
@@ -82,4 +83,86 @@ func (a *API) GetGameStatus(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	respondWithJSON(res, http.StatusOK, gameStatusResp{s.simulator.State, s.moveNum})
+}
+
+//PostMove attempts to make a game move
+func (a *API) PostMove(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(res, http.StatusBadRequest, "Invalid game ID")
+		return
+	}
+	var gr gameMovePostReq
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&gr); err != nil {
+		respondWithError(res, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+	defer req.Body.Close()
+	if gr.PlayerID != "red" && gr.PlayerID != "blue" {
+		respondWithError(res, http.StatusBadRequest, "Bad player ID")
+		return
+	}
+	var p *Player
+
+	s, isset := a.games[id]
+	if !isset {
+		respondWithError(res, http.StatusBadRequest, "No such game")
+		return
+	}
+	if gr.PlayerID == "red" {
+		p = s.redPlayer
+	} else {
+		p = s.bluePlayer
+	}
+	parsed, err := s.tryMove(p, gr.Move)
+	if err != nil {
+		respondWithJSON(res, http.StatusOK, gameMovePostRes{false, false, parsed.String(), err})
+	}
+
+}
+
+//GetMove returns the move made at turn X
+func (a *API) GetMove(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(res, http.StatusBadRequest, "Invalid game ID")
+		return
+	}
+	move, err := strconv.Atoi(vars["move_number"])
+	if err != nil {
+		respondWithError(res, http.StatusBadRequest, "Invalid move number")
+		return
+	}
+	var gr gameMoveReq
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&gr); err != nil {
+		respondWithError(res, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+	defer req.Body.Close()
+	if gr.PlayerID != "red" && gr.PlayerID != "blue" {
+		respondWithError(res, http.StatusBadRequest, "Bad player ID")
+		return
+	}
+	var p *Player
+
+	s, isset := a.games[id]
+	if !isset {
+		respondWithError(res, http.StatusBadRequest, "No such game")
+		return
+	}
+	if gr.PlayerID == "red" {
+		p = s.redPlayer
+	} else {
+		p = s.bluePlayer
+	}
+	moveRes, err := s.getMove(p, move)
+	if err != nil {
+		respondWithError(res, http.StatusBadRequest, "No such move")
+		return
+	}
+	respondWithJSON(res, http.StatusOK, gameMoveRes{moveRes})
 }
