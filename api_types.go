@@ -1,6 +1,6 @@
 package main
 
-import "git.saintnet.tech/freego"
+import "git.saintnet.tech/stryan/freego"
 
 //type newGameReq struct{}
 
