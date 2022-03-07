@@ -75,14 +75,21 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "Bad player ID")
 		return
 	}
+	var p *Player
+
 	s, isset := a.games[id]
 	if !isset {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
-	//TODO filter based off player info
+	if gr.PlayerID == "red" {
+		p = s.redPlayer
+	} else {
+		p = s.bluePlayer
+	}
+
 	log.Println("sending game state")
-	respondWithJSON(res, http.StatusOK, gameResp{s.simulator})
+	respondWithJSON(res, http.StatusOK, gameResp{s.getBoard(p)})
 	return
 }
 

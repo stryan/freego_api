@@ -77,3 +77,40 @@ func (s *Session) getMove(p *Player, num int) (string, error) {
 	}
 	return fmt.Sprintf("%v %v", num, s.moveList[num].String()), nil
 }
+
+func (s *Session) getBoard(p *Player) [8][8]*ViewTile {
+	var res [8][8]*ViewTile
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			cur := NewViewTile()
+			terrain, err := s.simulator.Board.IsTerrain(i, j)
+			if err != nil {
+				panic(err)
+			}
+			if terrain {
+				cur.Terrain = true
+			} else {
+				piece, err := s.simulator.Board.GetPiece(i, j)
+				if err != nil {
+					panic(err)
+				}
+				if piece != nil {
+					if piece.Hidden {
+						cur.Hidden = true
+						if piece.Owner == p.Colour() {
+							cur.Piece = piece.Rank.String()
+						} else {
+							cur.Piece = "Unknown"
+						}
+					} else {
+						cur.Piece = piece.Rank.String()
+					}
+				} else {
+					cur.Empty = true
+				}
+			}
+			res[i][j] = cur
+		}
+	}
+	return res
+}

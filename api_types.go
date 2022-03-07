@@ -14,7 +14,7 @@ type gameReq struct {
 }
 
 type gameResp struct {
-	GameBoard *freego.Game `json:"board"`
+	GameBoard [8][8]*ViewTile `json:"board"`
 }
 
 type gameStatusReq struct {
