@@ -32,6 +32,7 @@ func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
 				initDummy(g.simulator)
 			}
 			respondWithJSON(res, http.StatusOK, newGameResp{i, "red"})
+			return
 		}
 		if !g.bluePlayer.Ready {
 			g.bluePlayer.Ready = true
