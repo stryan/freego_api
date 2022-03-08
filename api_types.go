@@ -9,16 +9,8 @@ type newGameResp struct {
 	PlayerID string `json:"player_id"`
 }
 
-type gameReq struct {
-	PlayerID string `json:"player_id"`
-}
-
 type gameResp struct {
 	GameBoard [8][8]*ViewTile `json:"board"`
-}
-
-type gameStatusReq struct {
-	PlayerID string `json:"player_id"`
 }
 
 type gameStatusResp struct {
@@ -27,8 +19,7 @@ type gameStatusResp struct {
 }
 
 type gameMovePostReq struct {
-	PlayerID string `json:"player_id"`
-	Move     string `json:"move"`
+	Move string `json:"move"`
 }
 
 type gameMovePostRes struct {
@@ -36,10 +27,6 @@ type gameMovePostRes struct {
 	Result bool   `json:"result"`
 	Parsed string `json:"parsed"`
 	Error  error  `json:"error"`
-}
-
-type gameMoveReq struct {
-	PlayerID string `json:"player_id"`
 }
 
 type gameMoveRes struct {

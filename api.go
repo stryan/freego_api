@@ -63,18 +63,7 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "Invalid game ID")
 		return
 	}
-	var gr gameReq
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&gr); err != nil {
-		log.Println(err)
-		respondWithError(res, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	defer req.Body.Close()
-	if gr.PlayerID != "red" && gr.PlayerID != "blue" {
-		respondWithError(res, http.StatusBadRequest, "Bad player ID")
-		return
-	}
+	pid := req.Header.Get("Player-id")
 	var p *Player
 
 	s, isset := a.games[id]
@@ -82,10 +71,13 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
-	if gr.PlayerID == "red" {
+	if pid == "red" {
 		p = s.redPlayer
-	} else {
+	} else if pid == "blue" {
 		p = s.bluePlayer
+	} else {
+		respondWithError(res, http.StatusBadRequest, "Bad player ID")
+		return
 	}
 
 	log.Println("sending game state")
@@ -101,23 +93,22 @@ func (a *API) GetGameStatus(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "Invalid game ID")
 		return
 	}
-	var gr gameReq
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&gr); err != nil {
-		respondWithError(res, http.StatusBadRequest, "Invalid resquest payload")
-		return
-	}
-	defer req.Body.Close()
-	if gr.PlayerID != "red" && gr.PlayerID != "blue" {
-		respondWithError(res, http.StatusBadRequest, "Bad player ID")
-		return
-	}
 	s, isset := a.games[id]
 	if !isset {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
-	log.Println("sending game status")
+	pid := req.Header.Get("Player-id")
+	var p *Player
+	if pid == "red" {
+		p = s.redPlayer
+	} else if pid == "blue" {
+		p = s.bluePlayer
+	} else {
+		respondWithError(res, http.StatusBadRequest, "Bad player ID")
+		return
+	}
+	log.Printf("sending game status to player %v", p.Team)
 	respondWithJSON(res, http.StatusOK, gameStatusResp{s.simulator.State, s.moveNum})
 }
 
@@ -132,14 +123,11 @@ func (a *API) PostMove(res http.ResponseWriter, req *http.Request) {
 	var gr gameMovePostReq
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&gr); err != nil {
-		respondWithError(res, http.StatusBadRequest, "Invalid resquest payload")
+		respondWithError(res, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 	defer req.Body.Close()
-	if gr.PlayerID != "red" && gr.PlayerID != "blue" {
-		respondWithError(res, http.StatusBadRequest, "Bad player ID")
-		return
-	}
+	pid := req.Header.Get("Player-id")
 	var p *Player
 
 	s, isset := a.games[id]
@@ -147,10 +135,13 @@ func (a *API) PostMove(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
-	if gr.PlayerID == "red" {
+	if pid == "red" {
 		p = s.redPlayer
-	} else {
+	} else if pid == "blue" {
 		p = s.bluePlayer
+	} else {
+		respondWithError(res, http.StatusBadRequest, "Bad player ID")
+		return
 	}
 	parsed, err := s.tryMove(p, gr.Move)
 	if err != nil {
@@ -180,17 +171,6 @@ func (a *API) GetMove(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "Invalid move number")
 		return
 	}
-	var gr gameMoveReq
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&gr); err != nil {
-		respondWithError(res, http.StatusBadRequest, "Invalid resquest payload")
-		return
-	}
-	defer req.Body.Close()
-	if gr.PlayerID != "red" && gr.PlayerID != "blue" {
-		respondWithError(res, http.StatusBadRequest, "Bad player ID")
-		return
-	}
 	var p *Player
 
 	s, isset := a.games[id]
@@ -198,10 +178,14 @@ func (a *API) GetMove(res http.ResponseWriter, req *http.Request) {
 		respondWithError(res, http.StatusBadRequest, "No such game")
 		return
 	}
-	if gr.PlayerID == "red" {
+	pid := req.Header.Get("Player-id")
+	if pid == "red" {
 		p = s.redPlayer
-	} else {
+	} else if pid == "blue" {
 		p = s.bluePlayer
+	} else {
+		respondWithError(res, http.StatusBadRequest, "Bad player ID")
+		return
 	}
 	moveRes, err := s.getMove(p, move)
 	if err != nil {
