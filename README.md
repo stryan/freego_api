@@ -14,3 +14,6 @@ Currently stores no state and has no user authentication, so using it should jus
   POST /game/{id}/move
   GET /game/{id}/move/{movenum}
 ```
+
+## Authorization headers
+  Requests should contain header "Player-id"="red|blue"
