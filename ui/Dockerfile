@@ -5,6 +5,7 @@ COPY package-lock.json .
 RUN npm install
 
 FROM base as dependencies
+COPY utils /utils
 COPY pages /pages
 COPY public /public
 COPY styles /styles

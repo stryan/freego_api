@@ -4,3 +4,8 @@ export interface Cell {
   hidden: boolean;
   empty: boolean;
 }
+
+export interface Position {
+  row: number;
+  column: number;
+}

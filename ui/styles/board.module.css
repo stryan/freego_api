@@ -5,4 +5,9 @@
 .gridCell {
   border: 1px solid black;
   padding-top: 100%; /* 100% is supposed to be 1:1 aspect ratio but it doesn't look like it */ 
+  background: 0;
+}
+
+.cellClicked {
+  border: 1px solid red;
 }

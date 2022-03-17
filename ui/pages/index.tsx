@@ -11,7 +11,7 @@ const Home: NextPage = () => (
       <link rel="icon" href="/favicon.ico" />
     </Head>
     <main>
-      <Game gameId={1} />
+      <Game gameId={1} playerId="red" />
     </main>
   </div>
 );
