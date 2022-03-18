@@ -82,14 +82,17 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 
 	log.Println("sending game state")
 	rotatedBoard := s.getBoard(p)
-	i := 0
-	temp := rotatedBoard[0]
-	for ; i < len(rotatedBoard)-1; i++ {
-		rotatedBoard[i] = rotatedBoard[i+1]
-	}
+	rotate := req.Header.Get("Rotate")
+	if rotate == "true" {
+		i := 0
+		temp := rotatedBoard[0]
+		for ; i < len(rotatedBoard)-1; i++ {
+			rotatedBoard[i] = rotatedBoard[i+1]
+		}
 
-	rotatedBoard[i] = temp
-	respondWithJSON(res, http.StatusOK, rotatedBoard)
+		rotatedBoard[i] = temp
+	}
+	respondWithJSON(res, http.StatusOK, gameResp{rotatedBoard})
 	return
 }
 
