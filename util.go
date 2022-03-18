@@ -21,6 +21,16 @@ func respondWithJSON(res http.ResponseWriter, code int, payload interface{}) {
 	res.Write(response)
 }
 
+func rotateBoard(board [][]*ViewTile) {
+	i := 0
+	temp := board[0]
+	for ; i < len(board)-1; i++ {
+		board[i] = board[i+1]
+	}
+
+	board[i] = temp
+}
+
 //TODO remove this when you can actually setup a game
 func initDummy(g *freego.Game) {
 	//Setup terrain

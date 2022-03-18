@@ -15,6 +15,7 @@ type Session struct {
 	bluePlayer *Player
 	moveNum    int
 	moveList   []freego.ParsedCommand
+	boardSize  int
 }
 
 //Player is a player in a match
@@ -34,7 +35,7 @@ func (p *Player) Colour() freego.Colour {
 }
 
 //NewSession creates a new game session
-func NewSession() *Session {
+func NewSession(size int) *Session {
 	sim := freego.NewGame()
 	return &Session{
 		simulator:  sim,
@@ -42,6 +43,7 @@ func NewSession() *Session {
 		bluePlayer: &Player{false, freego.Blue},
 		moveNum:    1,
 		moveList:   make([]freego.ParsedCommand, 20),
+		boardSize:  size,
 	}
 }
 
@@ -78,10 +80,13 @@ func (s *Session) getMove(p *Player, num int) (string, error) {
 	return fmt.Sprintf("%v %v", num, s.moveList[num].String()), nil
 }
 
-func (s *Session) getBoard(p *Player) [8][8]*ViewTile {
-	var res [8][8]*ViewTile
-	for i := 0; i < 8; i++ {
-		for j := 0; j < 8; j++ {
+func (s *Session) getBoard(p *Player) [][]*ViewTile {
+	res := make([][]*ViewTile, s.boardSize)
+	for i := range res {
+		res[i] = make([]*ViewTile, s.boardSize)
+	}
+	for i := 0; i < s.boardSize; i++ {
+		for j := 0; j < s.boardSize; j++ {
 			cur := NewViewTile()
 			terrain, err := s.simulator.Board.IsTerrain(i, j)
 			if err != nil {
@@ -109,7 +114,7 @@ func (s *Session) getBoard(p *Player) [8][8]*ViewTile {
 					cur.Empty = true
 				}
 			}
-			res[i][j] = cur
+			res[j][i] = cur
 		}
 	}
 	return res

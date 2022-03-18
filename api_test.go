@@ -23,7 +23,7 @@ func TestNewAPI(t *testing.T) {
 
 func dummyGame(a *API) int {
 	i := a.nextInt
-	a.games[i] = NewSession()
+	a.games[i] = NewSession(8)
 	a.games[i].redPlayer.Ready = true
 	a.games[i].bluePlayer.Ready = true
 	a.games[i].simulator.Setup()
@@ -107,7 +107,7 @@ func TestGetGame(t *testing.T) {
 				}
 				for j := range respStruct.GameBoard {
 					for i, vt := range respStruct.GameBoard[j] {
-						curr, err := a.games[gid].simulator.Board.GetPiece(j, i)
+						curr, err := a.games[gid].simulator.Board.GetPiece(i, j)
 						if err != nil {
 							t.Fatalf("Strange board position: %v", err)
 						}

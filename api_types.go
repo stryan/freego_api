@@ -10,7 +10,7 @@ type newGameResp struct {
 }
 
 type gameResp struct {
-	GameBoard [8][8]*ViewTile `json:"board"`
+	GameBoard [][]*ViewTile `json:"board"`
 }
 
 type gameStatusResp struct {

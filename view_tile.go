@@ -12,3 +12,16 @@ type ViewTile struct {
 func NewViewTile() *ViewTile {
 	return &ViewTile{}
 }
+
+func (vt *ViewTile) String() string {
+	if vt.Piece != "" {
+		return vt.Piece
+	}
+	if vt.Hidden {
+		return "?"
+	}
+	if vt.Terrain {
+		return "X"
+	}
+	return " "
+}

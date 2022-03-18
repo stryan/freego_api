@@ -49,7 +49,7 @@ func (a *API) NewGame(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 	log.Printf("creating new game %v", a.nextInt)
-	a.games[a.nextInt] = NewSession()
+	a.games[a.nextInt] = NewSession(8)
 	a.games[a.nextInt].redPlayer.Ready = true
 	respondWithJSON(res, http.StatusOK, newGameResp{a.nextInt, "red"})
 	a.nextInt = a.nextInt + 1
@@ -81,18 +81,16 @@ func (a *API) GetGame(res http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Println("sending game state")
-	rotatedBoard := s.getBoard(p)
+	board := s.getBoard(p)
 	rotate := req.Header.Get("Rotate")
 	if rotate == "true" {
-		i := 0
-		temp := rotatedBoard[0]
-		for ; i < len(rotatedBoard)-1; i++ {
-			rotatedBoard[i] = rotatedBoard[i+1]
-		}
+		log.Println("rotating output")
+		//rotateBoard(board)
+		//rotateBoard(board)
+		//rotateBoard(board)
 
-		rotatedBoard[i] = temp
 	}
-	respondWithJSON(res, http.StatusOK, gameResp{rotatedBoard})
+	respondWithJSON(res, http.StatusOK, gameResp{board})
 	return
 }
 
